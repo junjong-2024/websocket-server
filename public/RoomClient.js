@@ -50,7 +50,7 @@ class RoomClient {
       }.bind(this)
     )
 
-    this.createRoom(room_id).then(
+    this.createRoom(room_id, name).then(
       async function () {
         try {
           await this.join(name, room_id);
@@ -67,10 +67,22 @@ class RoomClient {
 
   ////////// INIT /////////
 
-  async createRoom(room_id) {
+  async start() {
+    let room_id = this.room_id;
+    let name = this.name;
+    await this.socket.request('start', {
+      room_id,
+      name
+    }).catch((err) => {
+      console.log('Start debate error:', err)
+    });
+  }
+
+  async createRoom(room_id, name) {
     await this.socket
       .request('createRoom', {
-        room_id
+        room_id,
+        name
       })
       .catch((err) => {
         console.log('Create room error:', err)
@@ -235,6 +247,12 @@ class RoomClient {
   }
 
   initSockets() {
+    this.socket.on(
+      'rule',
+      function (data) {
+        console.log(new Date().toISOString(), data);
+      }
+    )
     this.socket.on(
       'consumerClosed',
       function ({ consumer_id }) {

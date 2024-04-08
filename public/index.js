@@ -20,6 +20,10 @@ socket.request = function request(type, data = {}) {
 
 let rc = null
 
+function start() {
+  rc.start();
+}
+
 function joinRoom(name, room_id) {
   if (rc && rc.isOpen()) {
     console.log('Already connected to a room')
@@ -34,6 +38,7 @@ function joinRoom(name, room_id) {
 
 function roomOpen() {
   login.className = 'hidden'
+  reveal(startButton)
   reveal(startAudioButton)
   hide(stopAudioButton)
   reveal(startVideoButton)
