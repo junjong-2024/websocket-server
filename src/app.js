@@ -21,11 +21,11 @@ const options = {
 const sample_debate = {
   name: 'SAMPLE',
   data: [
-    { debater: 'team_a_1', msg: '팀 A 입안', time: 5 },
-    { debater: 'team_b_1', msg: '팀 B 입안', time: 5 },
-    { debater: 'each_team', msg: '준비시간', time: 5 },
-    { debater: 'team_a_2', msg: '팀 A 교차질의', time: 5 },
-    { debater: 'team_b_2', msg: '팀 B 교차질의', time: 5 }
+    { debater: 'team_a_1', msg: '팀 A 입안', time: 2 },
+    { debater: 'team_b_1', msg: '팀 B 입안', time: 2 },
+    { debater: 'each_team', msg: '준비시간', time: 2 },
+    { debater: 'team_a_2', msg: '팀 A 교차질의', time: 2 },
+    { debater: 'team_b_2', msg: '팀 B 교차질의', time: 2 }
   ]
 };
 
@@ -99,7 +99,7 @@ io.on('connection', (socket) => {
     } else {
       console.log('Created room', { room_id: room_id });
       let worker = await getMediasoupWorker();
-      roomList.set(room_id, new Room(room_id, name, 3, sample_debate, worker, io));
+      roomList.set(room_id, new Room(room_id, name, 3, structuredClone(sample_debate), worker, io));
       callback(room_id);
     }
   });

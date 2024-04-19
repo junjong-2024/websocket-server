@@ -1,3 +1,7 @@
+import { mediasoup as _mediasoup } from './config.js';
+import { getPort, releasePort } from './port.js';
+import FFmpeg from './ffmpeg.js';
+
 export default class Peer {
   constructor(socket_id, socket, name) {
     this.id = socket_id;
@@ -6,6 +10,8 @@ export default class Peer {
     this.transports = new Map();
     this.consumers = new Map();
     this.producers = new Map();
+    this.remotePorts = [];
+    this.process = null;
   }
 
   sendRule(data) {
@@ -110,5 +116,98 @@ export default class Peer {
 
   removeConsumer(consumer_id) {
     this.consumers.delete(consumer_id);
+  }
+
+  async publishProducerRtpStream(router, producer) {
+    console.log('publishProducerRtpStream()');
+  
+    const rtpTransport = await router.createPlainTransport(_mediasoup.plainRtpTransport);
+  
+    // Set the receiver RTP ports
+    const remoteRtpPort = await getPort();
+    this.remotePorts.push(remoteRtpPort);
+  
+    let remoteRtcpPort;
+  
+    // Connect the mediasoup RTP transport to the ports used by GStreamer
+    await rtpTransport.connect({
+      ip: '127.0.0.1',
+      port: remoteRtpPort,
+      rtcpPort: remoteRtcpPort
+    });
+  
+    this.addTransport(rtpTransport);
+  
+    const codecs = [];
+    // Codec passed to the RTP Consumer must match the codec in the Mediasoup router rtpCapabilities
+    const routerCodec = router.rtpCapabilities.codecs.find(
+      codec => codec.kind === producer.kind
+    );
+    codecs.push(routerCodec);
+  
+    const rtpCapabilities = {
+      codecs,
+      rtcpFeedback: []
+    };
+  
+    // Start the consumer paused
+    // Once the gstreamer process is ready to consume resume and send a keyframe
+    const consumer = await rtpTransport.consume({
+      producerId: producer.id,
+      rtpCapabilities,
+      paused: true
+    });
+  
+    this.consumers.set(consumer.id, consumer);
+
+    consumer.on(
+      'transportclose',
+      function () {
+        console.log('Recorder consumer transport close', { name: `${this.name}`, consumer_id: `${consumer.id}` });
+        this.consumers.delete(consumer.id);
+        this.transports.delete(rtpTransport.id);
+      }.bind(this)
+    );
+  
+    return {
+      remoteRtpPort,
+      remoteRtcpPort,
+      localRtcpPort: rtpTransport.rtcpTuple ? rtpTransport.rtcpTuple.localPort : undefined,
+      rtpCapabilities,
+      rtpParameters: consumer.rtpParameters
+    };
+  };
+
+  async startRecord(router) {
+    console.log('Start record', { name: `${this.name}` });
+    let recordInfo = {};
+  
+    for (const [,producer] of this.producers) {
+      recordInfo[producer.kind] = await this.publishProducerRtpStream(router, producer);
+    }
+  
+    recordInfo.fileName = this.id;
+  
+    this.process = new FFmpeg(recordInfo);
+    setTimeout(async () => {
+      for (const [,consumer] of this.consumers) {
+        // Sometimes the consumer gets resumed before the GStreamer process has fully started
+        // so wait a couple of seconds
+        await consumer.resume();
+        await consumer.requestKeyFrame();
+      }
+    }, 1000);
+  };
+
+  stopRecord() {
+    console.log('Stop record', { name: `${this.name}` });
+    if (this.process) {
+      this.process.kill();
+      this.process = null;
+    }
+
+    for (const remotePort of this.remotePorts) {
+      releasePort(remotePort);
+    }
   }
 }
