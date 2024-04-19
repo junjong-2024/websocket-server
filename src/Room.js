@@ -1,4 +1,5 @@
 import { mediasoup } from './config.js';
+
 export default class Room {
   constructor(room_id, owner, maxCount, rule, worker, io) {
     this.id = room_id;
@@ -25,6 +26,7 @@ export default class Room {
     if (data.length == 0) {
       this.peers.forEach((peer) => {
         peer.sendRule({ debater: 'end' });
+        peer.stopRecord();
       });
       return;
     }
@@ -40,6 +42,9 @@ export default class Room {
   start(name) {
     if (name !== this.owner)
       return false;
+    this.peers.forEach((peer) => {
+      peer.startRecord(this.router);
+    });
     this.loop(this.rule.data);
     return true;
   }

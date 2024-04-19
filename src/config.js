@@ -26,7 +26,7 @@ export const mediasoup = {
   numWorkers: Object.keys(cpus()).length,
   worker: {
     rtcMinPort: 10000,
-    rtcMaxPort: 10100,
+    rtcMaxPort: 19999,
     logLevel: 'warn',
     logTags: [
       'info',
@@ -102,5 +102,10 @@ export const mediasoup = {
     ],
     maxIncomingBitrate: 1500000,
     initialAvailableOutgoingBitrate: 1000000
+  },
+  plainRtpTransport: {
+    listenInfo: { protocol: 'udp', ip: '0.0.0.0' },
+    rtcpMux: true,
+    comedia: false
   }
 };
