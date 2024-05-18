@@ -19,18 +19,28 @@ const options = {
 };
 
 const sample_debate = {
-  name: 'SAMPLE',
-  data: [
-    { debater: 'team_a_1', msg: '팀 A 입안', time: 2 },
-    { debater: 'team_b_1', msg: '팀 B 입안', time: 2 },
-    { debater: 'each_team', msg: '준비시간', time: 2 },
-    { debater: 'team_a_2', msg: '팀 A 교차질의', time: 2 },
-    { debater: 'team_b_2', msg: '팀 B 교차질의', time: 2 }
+  name: '토론대회1',
+  description: '주제는 어쩌구 입니다 지금부터 토론을 시작하겠습니다.',
+  rules: [
+    { debater: 'team_a_1', msg: '팀 A 입안', time: 10 },
+    { debater: 'team_b_1', msg: '팀 B 입안', time: 10 },
+    { debater: 'team_a_2', msg: '팀 A 교차질의', time: 10 },
+    { debater: 'team_b_2', msg: '팀 B 교차질의', time: 10 },
+    { debater: 'team_a_3', msg: '팀 A 반박', time: 10 },
+    { debater: 'team_b_3', msg: '팀 B 반박', time: 10 },
+    { debater: 'team_a_1', msg: '팀 A 마무리', time: 10 },
+    { debater: 'team_b_1', msg: '팀 B 마무리', time: 10 }
   ]
 };
 
 const httpsServer = createServer(options, app);
-const io = new Server(httpsServer);
+const io = new Server(httpsServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
 
 app.use(express.static(join(__dirname, '.', 'public')));
 
