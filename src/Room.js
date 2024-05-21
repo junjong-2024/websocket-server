@@ -1,12 +1,17 @@
 import { mediasoup } from './config.js';
 
 export default class Room {
-  constructor(room_id, owner, maxCount, rule, worker, io) {
+  constructor(room_id, owner, rule, worker, io) {
     this.id = room_id;
     this.owner = owner;
-    this.maxCount = maxCount;
+    this.maxCount = rule.teamSize * rule.orderSize;
     this.rule = rule;
+    this.teamSize = rule.teamSize;
+    this.orderSize = rule.orderSize;
+    this.locatePeer = new Array(this.maxCount);
     this.count = 0;
+    this.isStart = false;
+    this.waitProcessCount = 0;
     const mediaCodecs = mediasoup.router.mediaCodecs;
     worker
       .createRouter({
@@ -39,13 +44,23 @@ export default class Room {
     }, cur.time * 1000);
   }
 
+  closeRecordProcess() {
+    this.waitProcessCount--;
+    console.log(this.waitProcessCount);
+    if (this.waitProcessCount == 0) {
+      console.log(`Record finished id: '${this.room_id}'`);
+    }
+  }
+
   start(name) {
     if (name !== this.owner)
       return false;
+    this.waitProcessCount = this.count;
+    console.log('this.waitProcessCount = ', this.waitProcessCount);
     this.peers.forEach((peer) => {
-      peer.startRecord(this.router);
+      peer.startRecord(this.router, () => this.closeRecordProcess());
     });
-    this.loop(this.rule.data);
+    this.loop(structuredClone(this.rule.rules));
     return true;
   }
 
@@ -53,13 +68,48 @@ export default class Room {
     return this.count < this.maxCount;
   }
 
-  addPeer(peer) {
-    if (this.count < this.maxCount) {
-      this.peers.set(peer.id, peer);
-      this.count++;
-      return true;
+  setLocatePeer(peer) {
+    for (let i = 0; i < this.teamSize; i++) {
+      for (let j = 0; j < this.orderSize; j++) {
+        if (this.locatePeer[i * this.orderSize + j] === undefined) {
+          this.locatePeer[i * this.orderSize + j] = peer;
+          return [i, j];
+        }
+      }
     }
-    return false;
+    return null;
+  }
+
+  removeLocatePeer(peer) {
+    for (let i = 0; i < this.teamSize; i++) {
+      for (let j = 0; j < this.orderSize; j++) {
+        if (this.locatePeer[i * this.orderSize + j] == peer) {
+          this.locatePeer[i * this.orderSize + j] = undefined;
+        }
+      }
+    }
+  }
+
+  swapLocatePeer(socket_id, team_0, order_0, team_1, order_1) {
+    let buf = this.locatePeer[team_0 * this.orderSize + order_0];
+    this.locatePeer[team_0 * this.orderSize + order_0] = this.locatePeer[team_1 * this.orderSize + order_1];
+    this.locatePeer[team_1 * this.orderSize + order_1] = buf;
+    this.broadCast(socket_id, 'swapUser', { 
+      team_0, order_0, team_1, order_1
+    });
+  }
+
+  addPeer(peer) {
+    let locate = this.setLocatePeer(peer);
+    if (locate == null)
+      return null;
+    this.broadCast(peer.socket_id, 'addUser', { 
+      id: peer.id, name: peer.name, team: locate[0], order: locate[1]
+    });
+    this.peers.set(peer.id, peer);
+    this.count++;
+    
+    return locate;
   }
 
   getProducerListForPeer() {
@@ -137,7 +187,7 @@ export default class Room {
         this.broadCast(socket_id, 'newProducers', [
           {
             producer_id: producer.id,
-            producer_socket_id: socket_id
+            id: socket_id
           }
         ]);
       }.bind(this)
@@ -179,9 +229,12 @@ export default class Room {
   }
 
   async removePeer(socket_id) {
-    this.peers.get(socket_id).close();
+    let peer = this.peers.get(socket_id);
+    peer.close();
     this.peers.delete(socket_id);
+    this.broadCast(socket_id, 'removeUser', { id: socket_id });
     this.count--;
+    this.removeLocatePeer(peer);
   }
 
   closeProducer(socket_id, producer_id) {
@@ -212,7 +265,8 @@ export default class Room {
     }
     return {
       id: this.id,
-      maxCount: this.maxCount,
+      teamSize: this.teamSize,
+      orderSize: this.orderSize,
       peers: JSON.stringify([...this.peers], replacer)
     };
   }

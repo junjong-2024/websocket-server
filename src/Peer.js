@@ -92,7 +92,8 @@ export default class Peer {
         rtpParameters: consumer.rtpParameters,
         type: consumer.type,
         producerPaused: consumer.producerPaused
-      }
+      },
+      socket_id: this.id
     };
   }
 
@@ -154,8 +155,7 @@ export default class Peer {
     // Once the gstreamer process is ready to consume resume and send a keyframe
     const consumer = await rtpTransport.consume({
       producerId: producer.id,
-      rtpCapabilities,
-      paused: true
+      rtpCapabilities
     });
   
     this.consumers.set(consumer.id, consumer);
@@ -174,21 +174,24 @@ export default class Peer {
       remoteRtcpPort,
       localRtcpPort: rtpTransport.rtcpTuple ? rtpTransport.rtcpTuple.localPort : undefined,
       rtpCapabilities,
-      rtpParameters: consumer.rtpParameters
+      rtpParameters: consumer.rtpParameters,
+      id: consumer.id
     };
   };
 
-  async startRecord(router) {
+  async startRecord(router, callback) {
     console.log('Start record', { name: `${this.name}` });
     let recordInfo = {};
+    this.recordConsumers = [];
   
     for (const [,producer] of this.producers) {
       recordInfo[producer.kind] = await this.publishProducerRtpStream(router, producer);
+      this.recordConsumers.push(recordInfo[producer.kind].id);
     }
   
     recordInfo.fileName = this.id;
   
-    this.process = new FFmpeg(recordInfo);
+    this.process = new FFmpeg(recordInfo, callback);
     setTimeout(async () => {
       for (const [,consumer] of this.consumers) {
         // Sometimes the consumer gets resumed before the GStreamer process has fully started
@@ -202,6 +205,10 @@ export default class Peer {
   stopRecord() {
     console.log('Stop record', { name: `${this.name}` });
     if (this.process) {
+      for (const consumerId of this.recordConsumers) {
+        this.consumers.get(consumerId).close();
+      }
+      this.recordConsumers = [];
       this.process.kill();
       this.process = null;
     }

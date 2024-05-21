@@ -247,6 +247,15 @@ class RoomClient {
   }
 
   initSockets() {
+    
+    /**
+     * 새로운 유저가 들어왔을 때
+     * { 
+     *   debater: 토론자 정보 `team_{team}_{order}` 와 같은 형태
+     *   msg:     토론 차례 정보
+     *   time:    현재 차례 제한시간
+     * }
+     */
     this.socket.on(
       'rule',
       function (data) {
@@ -262,9 +271,55 @@ class RoomClient {
     );
 
     /**
+     * 새로운 유저가 들어왔을 때
+     * {
+     *   id:    유저 id
+     *   name:  유저 이름
+     *   team:  팀 번호
+     *   order: 팀 내 순서 번호
+     * }
+     */
+    this.socket.on(
+      'addUser',
+      function (data) {
+        console.log('New user:', data);
+      }
+    );
+
+    /**
+     * 유저 팀/순서가 바뀌었을 때
+     * {
+     *    team_0:     바뀔 유저1 팀 번호
+     *    order_0:    바뀔 유저1 팀 내 순서
+     *    team_1:     바뀔 유저2 팀 번호
+     *    order_1:    바뀔 유저2 팀 내 순서
+     * }
+     */
+    this.socket.on(
+      'swapUser',
+      function (data) {
+        console.log('Swap user:', data);
+      }
+    );
+
+    /**
+     * 유저가 나갔을 때
+     * {
+     *   id:    유저 id
+     * }
+     */
+    this.socket.on(
+      'removeUser',
+      function (data) {
+        console.log('Remove user:', data);
+      }
+    );
+
+    /**
+     * 새로운 스트림이 들어왔을 때
      * data: [ {
-     *  producer_id:
-     *  producer_socket_id:
+     *  producer_id:  mediasoup 가 사용
+     *  id:           유저 id
      * }]
      */
     this.socket.on(
@@ -285,7 +340,7 @@ class RoomClient {
     );
   }
 
-  //////// MAIN FUNCTIONS /////////////
+  //////// MAIN FUNCTIONS 토론방 입장할때 호출 /////////////
 
   async produce(type, deviceId = null) {
     let mediaConstraints = {};
@@ -307,11 +362,11 @@ class RoomClient {
           video: {
             width: {
               min: 640,
-              ideal: 1920
+              ideal: 640
             },
             height: {
-              min: 400,
-              ideal: 1080
+              min: 480,
+              ideal: 480
             },
             deviceId: deviceId
             /*aspectRatio: {
@@ -441,7 +496,6 @@ class RoomClient {
     this.getConsumeStream(producer_id).then(
       function ({ consumer, stream, kind }) {
         this.consumers.set(consumer.id, consumer);
-        document.getElementById('count').innerHTML = `${this.consumers.size + 1}`;
 
         let elem;
         if (kind === 'video') {

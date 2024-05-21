@@ -21,15 +21,17 @@ const options = {
 const sample_debate = {
   name: '토론대회1',
   description: '주제는 어쩌구 입니다 지금부터 토론을 시작하겠습니다.',
+  teamSize: 2,
+  orderSize: 3,
   rules: [
-    { debater: 'team_a_1', msg: '팀 A 입안', time: 10 },
-    { debater: 'team_b_1', msg: '팀 B 입안', time: 10 },
-    { debater: 'team_a_2', msg: '팀 A 교차질의', time: 10 },
-    { debater: 'team_b_2', msg: '팀 B 교차질의', time: 10 },
-    { debater: 'team_a_3', msg: '팀 A 반박', time: 10 },
-    { debater: 'team_b_3', msg: '팀 B 반박', time: 10 },
-    { debater: 'team_a_1', msg: '팀 A 마무리', time: 10 },
-    { debater: 'team_b_1', msg: '팀 B 마무리', time: 10 }
+    { debater: 'team_0_0', msg: '팀 A 입안', time: 1 },
+    { debater: 'team_1_0', msg: '팀 B 입안', time: 1 },
+    { debater: 'team_0_1', msg: '팀 A 교차질의', time: 1 },
+    { debater: 'team_1_1', msg: '팀 B 교차질의', time: 1 },
+    { debater: 'team_0_2', msg: '팀 A 반박', time: 1 },
+    { debater: 'team_1_2', msg: '팀 B 반박', time: 1 },
+    { debater: 'team_0_0', msg: '팀 A 마무리', time: 1 },
+    { debater: 'team_1_0', msg: '팀 B 마무리', time: 1 }
   ]
 };
 
@@ -109,7 +111,7 @@ io.on('connection', (socket) => {
     } else {
       console.log('Created room', { room_id: room_id });
       let worker = await getMediasoupWorker();
-      roomList.set(room_id, new Room(room_id, name, 3, structuredClone(sample_debate), worker, io));
+      roomList.set(room_id, new Room(room_id, name, structuredClone(sample_debate), worker, io));
       callback(room_id);
     }
   });
@@ -143,10 +145,14 @@ io.on('connection', (socket) => {
       });
     }
     const room = roomList.get(room_id);
-    if (room.joinable()) {
-      room.addPeer(new Peer(socket.id, socket, name));
+    let locate = room.addPeer(new Peer(socket.id, socket, name));
+    if (locate) {
       socket.room_id = room_id;
-      cb(roomList.get(room_id).toJson());
+      cb({
+        ...roomList.get(room_id).toJson(),
+        team: locate[0],
+        order: locate[1]
+      });
     } else {
       console.log('User join failed', {
         room_id: room_id,
@@ -154,6 +160,13 @@ io.on('connection', (socket) => {
       });
       cb({ error: 'The room is full.' });
     }
+  });
+
+  socket.on('swapUser', ({ team_0, order_0, team_1, order_1 }) => {
+    console.log('User swap', {
+      team_0, order_0, team_1, order_1
+    });
+    roomList.get(socket.room_id).swapLocatePeer(socket.id, team_0, order_0, team_1, order_1);
   });
 
   socket.on('getProducers', () => {
