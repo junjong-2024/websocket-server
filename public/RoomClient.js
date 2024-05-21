@@ -249,7 +249,7 @@ class RoomClient {
   initSockets() {
     
     /**
-     * 새로운 유저가 들어왔을 때
+     * 현제 토론 순서
      * { 
      *   debater: 토론자 정보 `team_{team}_{order}` 와 같은 형태
      *   msg:     토론 차례 정보
