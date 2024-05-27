@@ -14,6 +14,10 @@ export default class Peer {
     this.process = null;
   }
 
+  getId() {
+    return this.id;
+  }
+
   sendRule(data) {
     this.socket.emit('rule', data);
   }

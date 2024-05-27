@@ -26,7 +26,7 @@ export const mediasoup = {
   numWorkers: Object.keys(cpus()).length,
   worker: {
     rtcMinPort: 10000,
-    rtcMaxPort: 19999,
+    rtcMaxPort: 10100,
     logLevel: 'warn',
     logTags: [
       'info',
@@ -97,7 +97,7 @@ export const mediasoup = {
     listenIps: [
       {
         ip: '0.0.0.0',
-        announcedIp: getLocalIp() // replace by public IP address
+        announcedIp: '127.0.0.1' // replace by public IP address
       }
     ],
     maxIncomingBitrate: 1500000,

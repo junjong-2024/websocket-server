@@ -60,7 +60,6 @@ class RoomClient {
         } catch(ex) {
           alert('The room is full!');
         }
-        
       }.bind(this)
     );
   }
@@ -126,6 +125,16 @@ class RoomClient {
       routerRtpCapabilities
     });
     return device;
+  }
+
+  async swapUser(team_0, order_0, team_1, order_1) {
+    await this.socket
+      .request('swapUser', { 
+        team_0, order_0, team_1, order_1 
+      })
+      .catch((err) => {
+        console.log('Swap user error:', err);
+      });
   }
 
   async initTransports(device) {

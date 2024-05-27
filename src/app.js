@@ -9,6 +9,7 @@ import Room from './Room.js';
 import Peer from './Peer.js';
 import { Server } from 'socket.io';
 import path from 'path';
+import RenderQueue from './RenderQueue.js';
 
 const __dirname = path.resolve();
 const app = express();
@@ -49,6 +50,14 @@ app.use(express.static(join(__dirname, '.', 'public')));
 httpsServer.listen(listenPort, () => {
   console.log('Listening on https://' + listenIp + ':' + listenPort);
 });
+
+
+const redisConfig = {
+  host: '127.0.0.1', // Redis server address
+  port: 6379,        // Redis server port
+  // You can add more Redis connection options here if needed
+};
+const renderQueue = new RenderQueue(redisConfig);
 
 // all mediasoup workers
 let workers = [];
@@ -111,7 +120,7 @@ io.on('connection', (socket) => {
     } else {
       console.log('Created room', { room_id: room_id });
       let worker = await getMediasoupWorker();
-      roomList.set(room_id, new Room(room_id, name, structuredClone(sample_debate), worker, io));
+      roomList.set(room_id, new Room(room_id, name, structuredClone(sample_debate), worker, io, renderQueue));
       callback(room_id);
     }
   });

@@ -6,7 +6,7 @@ import { EventEmitter } from 'events';
 import { createSdpText } from './sdp.js';
 import { convertStringToStream } from './utils.js';
 
-const RECORD_FILE_LOCATION_PATH = process.env.RECORD_FILE_LOCATION_PATH || './files';
+export const RECORD_FILE_LOCATION_PATH = process.env.RECORD_FILE_LOCATION_PATH || './files';
 
 export default class FFmpeg {
   constructor (rtpParameters, callback) {

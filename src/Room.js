@@ -1,7 +1,8 @@
 import { mediasoup } from './config.js';
+import { RECORD_FILE_LOCATION_PATH } from './ffmpeg.js';
 
 export default class Room {
-  constructor(room_id, owner, rule, worker, io) {
+  constructor(room_id, owner, rule, worker, io, renderQueue) {
     this.id = room_id;
     this.owner = owner;
     this.maxCount = rule.teamSize * rule.orderSize;
@@ -12,6 +13,7 @@ export default class Room {
     this.count = 0;
     this.isStart = false;
     this.waitProcessCount = 0;
+    this.renderQueue = renderQueue;
     const mediaCodecs = mediasoup.router.mediaCodecs;
     worker
       .createRouter({
@@ -48,7 +50,21 @@ export default class Room {
     this.waitProcessCount--;
     console.log(this.waitProcessCount);
     if (this.waitProcessCount == 0) {
-      console.log(`Record finished id: '${this.room_id}'`);
+      const members = [];
+      for (let i = 0; i < this.teamSize; i++)
+        for (let j = 0; j < this.orderSize; j++)
+          members.push({ 
+            debater: `team_${i}_${j}`,
+            filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`
+          });
+      console.log(`Record finished:`, {
+        name: this.rule.name,
+        description: this.rule.description,
+        team_size: this.teamSize,
+        order_size: this.orderSize,
+        members: members,
+        rules: this.rule.rules
+      });
     }
   }
 
@@ -56,7 +72,6 @@ export default class Room {
     if (name !== this.owner)
       return false;
     this.waitProcessCount = this.count;
-    console.log('this.waitProcessCount = ', this.waitProcessCount);
     this.peers.forEach((peer) => {
       peer.startRecord(this.router, () => this.closeRecordProcess());
     });
