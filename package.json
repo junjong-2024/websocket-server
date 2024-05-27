@@ -10,15 +10,13 @@
     "mon": "nodemon src/app.js",
     "watch": "watchify public/index.js -o public/bundle.js -v",
     "lint": "npx prettier --write .",
-    "docker-build": "docker build --tag dirvann/mediasoup-video-rooms .",
-    "docker-run": "docker run --name dirvann-mediasoup-rooms -p 10000-10100:10000-10100 -p 3016:3016 dirvann/mediasoup-video-rooms",
-    "docker-start": "docker start dirvann-mediasoup-rooms",
-    "docker-stop": "docker stop dirvann-mediasoup-rooms",
+    "docker-build": "docker build --tag debait-websocket-server .",
     "compile-mediasoup-client": "npx browserify mediasoup-client-compile.js -o public/modules/mediasoupclient.min.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bull": "^4.12.9",
     "express": "^4.19.2",
     "httpolyglot": "^0.1.2",
     "mediasoup": "^3.13.24",
@@ -26,13 +24,9 @@
     "socket.io": "^4.7.5"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.0.2",
-    "@eslint/js": "^9.0.0",
-    "eslint": "^9.0.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.1.1",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.3.0",
+    "eslint": "^9.3.0",
     "globals": "^15.0.0",
     "prettier": "^2.3.5"
   }
