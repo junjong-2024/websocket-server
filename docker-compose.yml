@@ -1,5 +1,18 @@
 version: '2'
 services:
+  debait-db:
+    image: mysql
+    container_name: debait-db
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: junjong2024QAWSEDRF
+      TZ: Asia/Seoul
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    platform: linux/x86_64
   debait-renderer:
     image: video-renderer:latest
     container_name: debait-renderer
@@ -11,12 +24,22 @@ services:
       - debait-net
     depends_on:
       - debait-redis
+  debait-api-server:
+    image: debait-api-server:latest
+    container_name: debait-api-server
+    ports:
+      - 8080:8080
+    depends_on:
+      - debait-db
+    networks:
+      - debait-net
   websocket:
     image: debait-websocket-server:latest
     container_name: websocket
     volumes:
       - ./files:/app/files
     ports:
+      - '3001:3000'
       - 10000-10100:10000-10100/tcp
       - 10000-10100:10000-10100/udp
     networks:
