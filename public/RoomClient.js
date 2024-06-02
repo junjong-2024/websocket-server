@@ -69,6 +69,7 @@ class RoomClient {
   async start() {
     let room_id = this.room_id;
     let name = this.name;
+    console.log('START');
     await this.socket.request('start', {
       room_id,
       name
@@ -434,7 +435,6 @@ class RoomClient {
           videoGoogleStartBitrate: 1000
         };
       }
-      console.log('asdf', this.producerTransport);
       producer = await this.producerTransport.produce(params);
 
       console.log('Producer', producer);

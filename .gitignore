@@ -134,3 +134,5 @@ ssl/
 
 # ffmpeg record files
 files/
+db/
+run.sh

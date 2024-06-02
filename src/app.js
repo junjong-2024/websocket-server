@@ -9,10 +9,13 @@ import Room from './Room.js';
 import Peer from './Peer.js';
 import { Server } from 'socket.io';
 import path from 'path';
+import { expressjwt } from 'express-jwt';
 import RenderQueue from './RenderQueue.js';
+import { makeid } from './utils.js';
 
 const __dirname = path.resolve();
 const app = express();
+app.use(express.json());
 
 const options = {
   key: readFileSync(join(__dirname, sslKey), 'utf-8'),
@@ -46,6 +49,21 @@ const io = new Server(httpsServer, {
 });
 
 app.use(express.static(join(__dirname, '.', 'public')));
+
+app.post('/room', expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS512"] }), async (req, res) => {
+  const userId = req.auth.sub;
+  let room_id = makeid(6);
+  while (roomList.has(room_id))
+    room_id = makeid(6);
+  console.log('AUTH:', userId);
+  console.log('BODY:', req.body);
+  console.log('Created room', { room_id: room_id });
+  let worker = await getMediasoupWorker();
+  roomList.set(room_id, new Room(room_id, req.body.name, req.body, worker, io, renderQueue));
+  res.send({
+    room_id 
+  });
+});
 
 httpsServer.listen(listenPort, () => {
   console.log('Listening on https://' + listenIp + ':' + listenPort);
