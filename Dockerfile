@@ -17,4 +17,4 @@ EXPOSE 10000-20000
 
 RUN npm i -g nodemon
 
-CMD ./run.sh
+CMD sh run.sh
