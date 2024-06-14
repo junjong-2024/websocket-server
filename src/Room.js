@@ -2,7 +2,8 @@ import { mediasoup } from './config.js';
 import { RECORD_FILE_LOCATION_PATH } from './ffmpeg.js';
 
 export default class Room {
-  constructor(room_id, owner, rule, worker, io, renderQueue) {
+  constructor(global_id, room_id, owner, rule, worker, io, renderQueue) {
+    this.global_id = global_id;
     this.id = room_id;
     this.owner = owner;
     this.maxCount = rule.teamSize * rule.orderSize;
@@ -58,6 +59,7 @@ export default class Room {
             filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`
           });
       console.log(`Record finished:`, {
+        global_id: this.global_id,
         name: this.rule.name,
         description: this.rule.description,
         team_size: this.teamSize,

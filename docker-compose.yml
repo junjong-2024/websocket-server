@@ -22,7 +22,8 @@ services:
     volumes:
       - ./files:/app/files
     environment:
-      - REDIS_HOST=debait-redis
+      REDIS_HOST: debait-redis
+      API_HOST: debait-api-server:8080
     networks:
       - debait-net
     depends_on:
@@ -30,6 +31,8 @@ services:
   debait-api-server:
     image: debait-api-server:latest
     container_name: debait-api-server
+    environment:
+      SOCKET_HOST: websocket:3000
     depends_on:
       - debait-db
     networks:
