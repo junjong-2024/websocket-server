@@ -49,15 +49,15 @@ const io = new Server(httpsServer, {
 });
 
 app.use(express.static(join(__dirname, '.', 'public')));
-
-app.post('/room/:id', expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS512"] }), async (req, res) => {
-  const userId = req.auth.sub;
+// expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS512"] })
+app.post('/room/:id', async (req, res) => {
+  // const userId = req.auth.sub;
   let room_id = makeid(6);
-  while (roomList.has(room_id))
-    room_id = makeid(6);
-  console.log('AUTH:', userId);
-  console.log('BODY:', req.body);
-  console.log('Created room', { room_id: room_id });
+  // while (roomList.has(room_id))
+  //   room_id = makeid(6);
+  // console.log('AUTH:', userId);
+  // console.log('BODY:', req.body);
+  // console.log('Created room', { room_id: room_id });
   let worker = await getMediasoupWorker();
   roomList.set(room_id, new Room(req.params.id, room_id, req.body.name, req.body, worker, io, renderQueue));
   res.send({
