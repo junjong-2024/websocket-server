@@ -148,7 +148,7 @@ io.on('connection', (socket) => {
   //     roomList.set(room_id, new Room(room_id, name, structuredClone(sample_debate), worker, io, renderQueue));
   //     callback(room_id);
   //   }
-  });
+  // });
 
   socket.on('start', ({ room_id, name }, cb) => {
     console.log('Debate start', {
