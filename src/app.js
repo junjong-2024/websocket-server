@@ -132,15 +132,15 @@ async function createWorkers() {
 }
 
 io.on('connection', (socket) => {
-  socket.on('createRoom', async ({ room_id, name }, callback) => {
-    if (roomList.has(room_id)) {
-      callback('already exists');
-    } else {
-      console.log('Created room', { room_id: room_id });
-      let worker = await getMediasoupWorker();
-      roomList.set(room_id, new Room(room_id, name, structuredClone(sample_debate), worker, io, renderQueue));
-      callback(room_id);
-    }
+  // socket.on('createRoom', async ({ room_id, name }, callback) => {
+  //   if (roomList.has(room_id)) {
+  //     callback('already exists');
+  //   } else {
+  //     console.log('Created room', { room_id: room_id });
+  //     let worker = await getMediasoupWorker();
+  //     roomList.set(room_id, new Room(room_id, name, structuredClone(sample_debate), worker, io, renderQueue));
+  //     callback(room_id);
+  //   }
   });
 
   socket.on('start', ({ room_id, name }, cb) => {
