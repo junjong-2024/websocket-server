@@ -32,7 +32,7 @@ services:
     image: debait-api-server:latest
     container_name: debait-api-server
     environment:
-      SOCKET_HOST: websocket:3000
+      SOCKET_SERVER_URL: websocket:3000
     depends_on:
       - debait-db
     networks:
