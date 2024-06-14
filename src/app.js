@@ -59,10 +59,17 @@ app.post('/room/:id', async (req, res) => {
   // console.log('BODY:', req.body);
   // console.log('Created room', { room_id: room_id });
   let worker = await getMediasoupWorker();
-  roomList.set(room_id, new Room(req.params.id, room_id, req.body.name, req.body, worker, io, renderQueue));
-  res.send({
-    room_id 
-  });
+  console.log(req.body);
+  try {
+    roomList.set(room_id, new Room(req.params.id, room_id, req.body.name, req.body, worker, io, renderQueue));
+    res.send({
+      room_id 
+    });
+  } catch (ex) {
+    res.send({
+      error: ex
+    });
+  }
 });
 
 httpsServer.listen(listenPort, () => {
