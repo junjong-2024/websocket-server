@@ -62,10 +62,11 @@ export default class Room {
         for (let j = 0; j < this.orderSize; j++)
           if (this.locatePeer[i*this.teamSize + j] !== undefined && this.locatePeer[i*this.teamSize + j].isRecord())
             members.push({ 
-              debater: `team_${i}_${j}`,
+              team: i,
+              order: j,
               filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`
             });
-      console.log(`Record finished:`, {
+      const data = {
         global_id: this.global_id,
         name: this.rule.name,
         description: this.rule.description,
@@ -73,7 +74,9 @@ export default class Room {
         order_size: this.orderSize,
         members: members,
         rules: this.rule.rules
-      });
+      };
+      console.log(`Record finished:`, data);
+      this.renderQueue.enqueue(data);
     }
   }
 
