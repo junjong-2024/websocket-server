@@ -82,10 +82,12 @@ export default class Room {
 
   start(name) {
     console.log('Room Info', {
+      name,
+      ownerName: this.owner,
       count: this.count,
       maxCount: this.maxCount
     });
-    if (name !== this.owner || this.count != this.maxCount)
+    if (this.count != this.maxCount)
       return false;
     this.waitProcessCount = this.count;
     clearTimeout(this.timeout);
