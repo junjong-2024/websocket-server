@@ -59,7 +59,10 @@ app.post('/room/:id', async (req, res) => {
   // console.log('BODY:', req.body);
   // console.log('Created room', { room_id: room_id });
   let worker = await getMediasoupWorker();
-  console.log(req.body);
+  console.log('Create Room', {
+    room_id,
+    body: req.body
+  });
   try {
     roomList.set(room_id, new Room(req.params.id, room_id, req.body.name, req.body, worker, io, renderQueue));
     res.send({
