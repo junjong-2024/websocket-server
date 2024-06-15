@@ -23,7 +23,7 @@ services:
       - ./public/files:/app/files
     environment:
       RABBITMQ_HOST: debait-rabbitmq
-      API_HOST: debait-api-server:8080
+      API_HOST: http://debait-api-server:8080
     networks:
       - debait-net
     depends_on:
