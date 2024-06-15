@@ -22,12 +22,12 @@ services:
     volumes:
       - ./public/files:/app/files
     environment:
-      REDIS_HOST: debait-redis
+      RABBITMQ_HOST: debait-rabbitmq
       API_HOST: debait-api-server:8080
     networks:
       - debait-net
     depends_on:
-      - debait-redis
+      - debait-rabbitmq
   debait-api-server:
     image: debait-api-server:latest
     container_name: debait-api-server
@@ -47,22 +47,19 @@ services:
       - 10000-10100:10000-10100/tcp
       - 10000-10100:10000-10100/udp
     environment:
-      REDIS_HOST: debait-redis
+      RABBITMQ_HOST: debait-rabbitmq
       RECORD_FILE_LOCATION_PATH: ./files
       JWT_SECRET: 11111111sdfasfewdhtdfgdfaesg349dasdjasdijdsfdgddsadafsvfadsgsfaegfvdsafdsasdasdsadwefdefw
     networks:
       - debait-net
-  debait-redis:
-      image: redis:alpine
-      container_name: debait-redis
-      command: redis-server --port 6379
-      networks:
-        - debait-net
-      labels:
-        - "name=redis"
-        - "mode=standalone"
-      ports:
-        - 6379:6379
+  debait-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: debait-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - debait-net
   debait-nginx:
     image: nginx:1.25.3-alpine
     container_name: debait-nginx

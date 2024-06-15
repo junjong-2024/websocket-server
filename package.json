@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bull": "^4.12.9",
+    "amqplib": "^0.10.4",
     "express": "^4.19.2",
     "express-jwt": "^8.4.1",
     "httpolyglot": "^0.1.2",

@@ -1,3 +1,4 @@
 export RECORD_FILE_LOCATION_PATH="./files"
 export JWT_SECRET="11111111sdfasfewdhtdfgdfaesg349dasdjasdijdsfdgddsadafsvfadsgsfaegfvdsafdsasdasdsadwefdefw"
+export RABBITMQ_HOST="localhost"
 npm start

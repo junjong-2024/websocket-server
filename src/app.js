@@ -79,13 +79,7 @@ httpsServer.listen(listenPort, () => {
   console.log('Listening on https://' + listenIp + ':' + listenPort);
 });
 
-
-const redisConfig = {
-  host: process.env.REDIS_HOST, // Redis server address
-  port: 6379,        // Redis server port
-  // You can add more Redis connection options here if needed
-};
-const renderQueue = new RenderQueue(redisConfig);
+const renderQueue = new RenderQueue(process.env.RABBITMQ_HOST);
 
 // all mediasoup workers
 let workers = [];

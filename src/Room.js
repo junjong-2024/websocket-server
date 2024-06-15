@@ -76,7 +76,7 @@ export default class Room {
         rules: this.rule.rules
       };
       console.log(`Record finished:`, data);
-      this.renderQueue.enqueue(data);
+      this.renderQueue.enqueue(JSON.stringify(data));
     }
   }
 
