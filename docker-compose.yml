@@ -20,7 +20,7 @@ services:
     image: video-renderer:latest
     container_name: debait-renderer
     volumes:
-      - ./files:/app/files
+      - ./public/files:/app/files
     environment:
       REDIS_HOST: debait-redis
       API_HOST: debait-api-server:8080
@@ -32,7 +32,7 @@ services:
     image: debait-api-server:latest
     container_name: debait-api-server
     environment:
-      SOCKET_SERVER_URL: websocket:3000
+      SOCKET_SERVER_URL: http://websocket:3000
     depends_on:
       - debait-db
     networks:
@@ -41,11 +41,15 @@ services:
     image: debait-websocket-server:latest
     container_name: websocket
     volumes:
-      - ./files:/app/files
+      - ./public/files:/app/files
     ports:
       - '3001:3000'
       - 10000-10100:10000-10100/tcp
       - 10000-10100:10000-10100/udp
+    environment:
+      REDIS_HOST: debait-redis
+      RECORD_FILE_LOCATION_PATH: ./files
+      JWT_SECRET: 11111111sdfasfewdhtdfgdfaesg349dasdjasdijdsfdgddsadafsvfadsgsfaegfvdsafdsasdasdsadwefdefw
     networks:
       - debait-net
   debait-redis:

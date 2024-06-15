@@ -81,7 +81,7 @@ httpsServer.listen(listenPort, () => {
 
 
 const redisConfig = {
-  host: '127.0.0.1', // Redis server address
+  host: process.env.REDIS_HOST, // Redis server address
   port: 6379,        // Redis server port
   // You can add more Redis connection options here if needed
 };

@@ -10,11 +10,10 @@ RUN npm install --force
 COPY src src
 COPY ssl ssl
 COPY public public
-COPY run.sh run.sh
 
 EXPOSE 3016
 EXPOSE 10000-20000
 
 RUN npm i -g nodemon
 
-CMD sh run.sh
+CMD npm start
