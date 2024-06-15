@@ -2,10 +2,12 @@ import amqp from 'amqplib/callback_api.js';
 
 export default class RenderQueue {
     constructor(host) {
-        amqp.connect(`amqp://${host}`, (error0, connection) => {
+        setTimeout(() => {
+            amqp.connect(`amqp://${host}`, (error0, connection) => {
             console.log(`connect to ${host}`);
             this.connection = connection;
         });
+        }, 1000 * 10);
     }
 
     enqueue(data) {
