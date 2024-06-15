@@ -15,6 +15,12 @@ export default class Room {
     this.isStart = false;
     this.waitProcessCount = 0;
     this.renderQueue = renderQueue;
+    this.timeout = setTimeout( () => {
+      console.log('Close Room:', this.id);
+      for (const [, peer] in this.peers) {
+        peer.close();
+      }
+    }, 1000 * 60 * 10);
     const mediaCodecs = mediasoup.router.mediaCodecs;
     worker
       .createRouter({
@@ -72,9 +78,10 @@ export default class Room {
   }
 
   start(name) {
-    if (name !== this.owner)
+    if (name !== this.owner || this.count != this.maxCount)
       return false;
     this.waitProcessCount = this.count;
+    clearTimeout(this.timeout);
     this.peers.forEach((peer) => {
       peer.startRecord(this.router, () => this.closeRecordProcess());
     });
