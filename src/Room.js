@@ -60,7 +60,7 @@ export default class Room {
       const members = [];
       for (let i = 0; i < this.teamSize; i++)
         for (let j = 0; j < this.orderSize; j++)
-          if (this.locatePeer[i*this.teamSize + j] !== undefined)
+          if (this.locatePeer[i*this.teamSize + j] !== undefined && this.locatePeer[i*this.teamSize + j].isRecord())
             members.push({ 
               debater: `team_${i}_${j}`,
               filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`

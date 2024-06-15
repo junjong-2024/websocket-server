@@ -12,6 +12,7 @@ export default class Peer {
     this.producers = new Map();
     this.remotePorts = [];
     this.process = null;
+    this.recorded = true;
   }
 
   getId() {
@@ -184,26 +185,32 @@ export default class Peer {
   };
 
   async startRecord(router, callback) {
-    console.log('Start record', { name: `${this.name}` });
-    let recordInfo = {};
-    this.recordConsumers = [];
-  
-    for (const [,producer] of this.producers) {
-      recordInfo[producer.kind] = await this.publishProducerRtpStream(router, producer);
-      this.recordConsumers.push(recordInfo[producer.kind].id);
-    }
-  
-    recordInfo.fileName = this.id;
-  
-    this.process = new FFmpeg(recordInfo, callback);
-    setTimeout(async () => {
-      for (const [,consumer] of this.consumers) {
-        // Sometimes the consumer gets resumed before the GStreamer process has fully started
-        // so wait a couple of seconds
-        await consumer.resume();
-        await consumer.requestKeyFrame();
+    try {
+      console.log('Start record', { name: `${this.name}` });
+      let recordInfo = {};
+      this.recordConsumers = [];
+    
+      for (const [,producer] of this.producers) {
+        recordInfo[producer.kind] = await this.publishProducerRtpStream(router, producer);
+        this.recordConsumers.push(recordInfo[producer.kind].id);
       }
-    }, 1000);
+    
+      recordInfo.fileName = this.id;
+    
+      this.process = new FFmpeg(recordInfo, callback);
+      setTimeout(async () => {
+        for (const [,consumer] of this.consumers) {
+          // Sometimes the consumer gets resumed before the GStreamer process has fully started
+          // so wait a couple of seconds
+          await consumer.resume();
+          await consumer.requestKeyFrame();
+        }
+      }, 1000);
+    } catch (ex) {
+      console.log('Record fail', ex);
+      this.recorded = false;
+      callback();
+    }
   };
 
   stopRecord() {
@@ -220,5 +227,9 @@ export default class Peer {
     for (const remotePort of this.remotePorts) {
       releasePort(remotePort);
     }
+  }
+  
+  isRecord() {
+    return this.recorded;
   }
 }
