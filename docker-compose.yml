@@ -28,6 +28,7 @@ services:
       - debait-net
     depends_on:
       - debait-rabbitmq
+      - websocket
   debait-api-server:
     image: debait-api-server:latest
     container_name: debait-api-server
