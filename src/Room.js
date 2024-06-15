@@ -71,7 +71,7 @@ export default class Room {
         name: this.rule.name,
         description: this.rule.description,
         team_size: this.teamSize,
-        order_size: this.orderSize,
+        order_size: this.orderSize, 
         members: members,
         rules: this.rule.rules
       };
@@ -81,6 +81,10 @@ export default class Room {
   }
 
   start(name) {
+    console.log('Room Info', {
+      count: this.count,
+      maxCount: this.maxCount
+    });
     if (name !== this.owner || this.count != this.maxCount)
       return false;
     this.waitProcessCount = this.count;
