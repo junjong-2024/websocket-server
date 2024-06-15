@@ -23,7 +23,8 @@ services:
       - ./public/files:/app/files
     environment:
       RABBITMQ_HOST: debait-rabbitmq
-      API_HOST: http://debait-api-server:8080
+      MYSQL_HOST: debait-db
+      MYSQL_PASSWORD: junjong2024QAWSEDRF
     networks:
       - debait-net
     depends_on:
