@@ -94,13 +94,7 @@ export default class Room {
     this.peers.forEach((peer) => {
       peer.startRecord(this.router, () => this.closeRecordProcess());
     });
-    this.peers.forEach((peer) => {
-      peer.sendRule({ debater: 'none', msg: this.rule.description, time: 10 });
-      peer.stopRecord();
-    });
-    setTimeout(() => {
-      this.loop(structuredClone(this.rule.rules));
-    }, 10 * 1000);
+    this.loop(structuredClone(this.rule.rules));
     return true;
   }
 
