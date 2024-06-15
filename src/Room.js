@@ -54,10 +54,11 @@ export default class Room {
       const members = [];
       for (let i = 0; i < this.teamSize; i++)
         for (let j = 0; j < this.orderSize; j++)
-          members.push({ 
-            debater: `team_${i}_${j}`,
-            filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`
-          });
+          if (this.locatePeer[i*this.teamSize + j] !== undefined)
+            members.push({ 
+              debater: `team_${i}_${j}`,
+              filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`
+            });
       console.log(`Record finished:`, {
         global_id: this.global_id,
         name: this.rule.name,
