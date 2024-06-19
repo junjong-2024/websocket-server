@@ -112,8 +112,8 @@ export default class Room {
       for (let j = 0; j < this.orderSize; j++) {
         if (this.locatePeer[i * this.orderSize + j] === undefined) {
           console.log('Set Locate', { i, j});
-          this.locatePeer.splice(i * this.orderSize + j, 0, peer);
-          // this.locatePeer[i * this.orderSize + j] = peer;
+          // this.locatePeer.splice(i * this.orderSize + j, 0, peer);
+          this.locatePeer[i * this.orderSize + j] = peer;
           return [i, j];
         }
       }
