@@ -109,7 +109,8 @@ export default class Room {
     for (let i = 0; i < this.teamSize; i++) {
       for (let j = 0; j < this.orderSize; j++) {
         if (this.locatePeer[i * this.orderSize + j] === undefined) {
-          this.locatePeer[i * this.orderSize + j] = peer;
+          this.locatePeer.splice(i * this.orderSize + j, 0, peer);
+          // this.locatePeer[i * this.orderSize + j] = peer;
           return [i, j];
         }
       }
