@@ -67,7 +67,7 @@ export default class Room {
             members.push({ 
               team: i,
               order: j,
-              filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].id}.webm`
+              filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`
             });
       }
       const data = {
