@@ -59,13 +59,15 @@ export default class Room {
     if (this.waitProcessCount == 0) {
       const members = [];
       for (let i = 0; i < this.teamSize; i++)
-        for (let j = 0; j < this.orderSize; j++)
+        for (let j = 0; j < this.orderSize; j++) {
+          console.log({ i, j, peer: this.locatePeer[i*this.teamSize + j]});
           if (this.locatePeer[i*this.teamSize + j] !== undefined)
             members.push({ 
               team: i,
               order: j,
               filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`
             });
+      }
       const data = {
         global_id: this.global_id,
         name: this.rule.name,
