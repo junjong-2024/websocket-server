@@ -10,7 +10,7 @@ export default class Room {
     this.rule = rule;
     this.teamSize = rule.teamSize;
     this.orderSize = rule.orderSize;
-    this.locatePeer = new Array(this.maxCount);
+    this.locatePeer = new Array(rule.teamSize * rule.orderSize);
     this.count = 0;
     this.isStart = false;
     this.waitProcessCount = 0;
@@ -57,10 +57,11 @@ export default class Room {
     this.waitProcessCount--;
     console.log(this.waitProcessCount);
     if (this.waitProcessCount == 0) {
+
+      console.log({ peer: this.locatePeer});
       const members = [];
       for (let i = 0; i < this.teamSize; i++)
         for (let j = 0; j < this.orderSize; j++) {
-          console.log({ i, j, peer: this.locatePeer[i*this.teamSize + j]});
           if (this.locatePeer[i*this.teamSize + j] !== undefined)
             members.push({ 
               team: i,
