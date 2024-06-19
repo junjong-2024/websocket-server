@@ -10,7 +10,7 @@ export default class Room {
     this.rule = rule;
     this.teamSize = rule.teamSize;
     this.orderSize = rule.orderSize;
-    this.locatePeer = new Array(rule.teamSize * rule.orderSize);
+    this.locatePeer = new Array(this.maxCount);
     this.count = 0;
     this.isStart = false;
     this.waitProcessCount = 0;
@@ -57,19 +57,15 @@ export default class Room {
     this.waitProcessCount--;
     console.log(this.waitProcessCount);
     if (this.waitProcessCount == 0) {
-
-      console.log({ peer: this.locatePeer});
       const members = [];
       for (let i = 0; i < this.teamSize; i++)
-        for (let j = 0; j < this.orderSize; j++) {
-            console.log(i, j);
-          if (this.locatePeer[i*this.teamSize + j] !== undefined)
+        for (let j = 0; j < this.orderSize; j++)
+          if (this.locatePeer[i*this.teamSize + j] !== undefined && this.locatePeer[i*this.teamSize + j].isRecord())
             members.push({ 
               team: i,
               order: j,
               filename: `${RECORD_FILE_LOCATION_PATH}/${this.locatePeer[i*this.teamSize + j].getId()}.webm`
             });
-      }
       const data = {
         global_id: this.global_id,
         name: this.rule.name,
@@ -111,8 +107,6 @@ export default class Room {
     for (let i = 0; i < this.teamSize; i++) {
       for (let j = 0; j < this.orderSize; j++) {
         if (this.locatePeer[i * this.orderSize + j] === undefined) {
-          console.log('Set Locate', { i, j});
-          // this.locatePeer.splice(i * this.orderSize + j, 0, peer);
           this.locatePeer[i * this.orderSize + j] = peer;
           return [i, j];
         }
