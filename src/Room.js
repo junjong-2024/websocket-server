@@ -62,7 +62,7 @@ export default class Room {
       const members = [];
       for (let i = 0; i < this.teamSize; i++)
         for (let j = 0; j < this.orderSize; j++) {
-          if (this.locatePeer[i*this.teamSize + j] !== undefined)
+          // if (this.locatePeer[i*this.teamSize + j] !== undefined)
             members.push({ 
               team: i,
               order: j,
@@ -110,6 +110,7 @@ export default class Room {
     for (let i = 0; i < this.teamSize; i++) {
       for (let j = 0; j < this.orderSize; j++) {
         if (this.locatePeer[i * this.orderSize + j] === undefined) {
+          console.log('Set Locate', { i, j});
           this.locatePeer.splice(i * this.orderSize + j, 0, peer);
           // this.locatePeer[i * this.orderSize + j] = peer;
           return [i, j];
