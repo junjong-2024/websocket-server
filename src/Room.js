@@ -63,7 +63,7 @@ export default class Room {
       for (let i = 0; i < this.teamSize; i++)
         for (let j = 0; j < this.orderSize; j++) {
             console.log(i, j);
-          // if (this.locatePeer[i*this.teamSize + j] !== undefined)
+          if (this.locatePeer[i*this.teamSize + j] !== undefined)
             members.push({ 
               team: i,
               order: j,
