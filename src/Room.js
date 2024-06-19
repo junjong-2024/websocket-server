@@ -60,7 +60,7 @@ export default class Room {
       const members = [];
       for (let i = 0; i < this.teamSize; i++)
         for (let j = 0; j < this.orderSize; j++)
-          if (this.locatePeer[i*this.teamSize + j] !== undefined && this.locatePeer[i*this.teamSize + j].isRecord())
+          if (this.locatePeer[i*this.teamSize + j] !== undefined)
             members.push({ 
               team: i,
               order: j,
@@ -94,6 +94,7 @@ export default class Room {
     this.peers.forEach((peer) => {
       peer.startRecord(this.router, () => this.closeRecordProcess());
     });
+    this.rule.rules.unshift({ debater: 'none', msg: this.rule.description, time: 10 });
     this.loop(structuredClone(this.rule.rules));
     return true;
   }
